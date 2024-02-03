@@ -1,6 +1,7 @@
 import { ImageComponent } from "./components/page/item/image.js";
 import { NoteComponent } from "./components/page/item/note.js";
 import { TodoComponent } from "./components/page/item/todo.js";
+import { VideoComponent } from "./components/page/item/video.js";
 import { PageComponent } from "./components/page/page.js";
 
 class App {
@@ -20,6 +21,12 @@ class App {
 
     const todo = new TodoComponent("Todo title", "Todo Item");
     todo.attachTo(appRoot, "beforeend");
+
+    const video = new VideoComponent(
+      "Video title",
+      "https://www.youtube.com/watch?v=0Emq5FypiMM&t=2s"
+    );
+    video.attachTo(appRoot, "beforeend");
   }
 }
 
