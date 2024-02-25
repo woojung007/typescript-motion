@@ -18,6 +18,7 @@ interface SectionContainer extends Component, Composable {
   setOnDragStateListener(listener: OnDragStateListener<SectionContainer>): void;
   muteChildren(state: "mute" | "unmute"): void;
   getBoundingRect(): DOMRect;
+  onDropped(): void;
 }
 
 type SectionContainerConstructor = {
@@ -61,24 +62,28 @@ export class PageItemComponent
     });
   }
 
-  onDragStart(event: DragEvent) {
-    console.log("drag start", event);
+  onDragStart(_: DragEvent) {
     this.notifyDragObservers("start");
+    this.element.classList.add("lifted");
   }
 
-  onDragEnd(event: DragEvent) {
-    console.log("drag end", event);
+  onDragEnd(_: DragEvent) {
     this.notifyDragObservers("stop");
+    this.element.classList.remove("lifted");
   }
 
-  onDragEnter(event: DragEvent) {
-    console.log("drag enter", event);
+  onDragEnter(_: DragEvent) {
     this.notifyDragObservers("enter");
+    this.element.classList.add("drop-area");
   }
 
-  onDragLeave(event: DragEvent) {
-    console.log("drag leave", event);
+  onDragLeave(_: DragEvent) {
     this.notifyDragObservers("leave");
+    this.element.classList.remove("drop-area");
+  }
+
+  onDropped() {
+    this.element.classList.remove("drop-area");
   }
 
   notifyDragObservers(state: DragState) {
@@ -135,12 +140,10 @@ export class PageComponent
 
   onDragOver(event: DragEvent) {
     event.preventDefault();
-    console.log("ondrag over");
   }
 
   onDrop(event: DragEvent) {
     event.preventDefault();
-    console.log("on drop");
 
     // 여기에서 위치를 바꿔주면 된다
     if (!this.dropTarget) {
@@ -157,6 +160,8 @@ export class PageComponent
         dropY < srcElement.y ? "beforebegin" : "afterend"
       );
     }
+
+    this.dropTarget.onDropped();
   }
 
   addChild(section: Component) {
@@ -170,8 +175,6 @@ export class PageComponent
     this.children.add(item);
     item.setOnDragStateListener(
       (target: SectionContainer, state: DragState) => {
-        console.log(target, state);
-
         switch (state) {
           case "start":
             this.dragTarget = target;
